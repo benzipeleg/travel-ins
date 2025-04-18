@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>השוואת מחירי ביטוח נסיעות</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Use Heebo font */
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f8fafc;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d1d5db' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        :root { --dark-blue: #1e3a8a; --dark-orange: #c2410c; --green: #16a34a; }
+        .form-input, .form-select {
+            @apply border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200 ease-in-out shadow-sm focus:bg-orange-50;
+        }
+        .form-checkbox, .form-radio { @apply focus:ring-orange-500 text-blue-600; }
+        .form-label { @apply block text-sm font-medium text-gray-700 mb-1.5; }
+        .btn { @apply px-6 py-2.5 rounded-lg font-semibold text-white transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:scale-105; }
+        .traveler-card { @apply border border-gray-200 p-4 rounded-xl mb-4 shadow-md bg-white; }
+        .result-card { @apply border border-gray-200 p-5 rounded-xl shadow-lg text-center bg-white flex flex-col justify-between transition-all duration-300 ease-in-out hover:shadow-xl hover:scale-[1.02]; }
+        .result-card h3 { @apply text-xl font-semibold text-gray-800 mb-3; }
+        .result-card img { @apply mx-auto mb-4 h-14 object-contain; }
+        .result-card .price { @apply text-3xl font-bold text-[var(--dark-blue)] my-2; }
+        .result-card .price-label { @apply text-sm text-gray-500 mt-1 mb-3; }
+        .result-card .btn-details {
+            background-color: var(--dark-orange);
+            color: white;
+            @apply w-full mt-auto btn;
+        }
+        .result-card .btn-details:hover { background-color: #ea580c; }
+        .result-card .btn-cheapest {
+            background-color: var(--green);
+            color: white;
+            @apply w-full mt-auto btn;
+        }
+        .result-card .btn-cheapest:hover { background-color: #15803d; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        .section-header { @apply text-2xl font-semibold text-[var(--dark-blue)] border-b-2 border-orange-400 pb-3 mb-6; }
+        .main-container { @apply max-w-5xl mx-auto bg-white p-8 md:p-10 rounded-xl shadow-2xl mt-6 mb-6; }
+        .checkbox-row { @apply flex items-center p-3 rounded-lg hover:bg-orange-50 transition duration-200 cursor-pointer; }
+        .checkbox-row input { @apply form-checkbox h-5 w-5; }
+        .checkbox-row label { @apply ml-3 text-gray-800 cursor-pointer; }
+        .checkbox-row label.disabled-label { @apply cursor-default text-gray-600; }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+    <div class="main-container">
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-[var(--dark-blue)] mb-10">השוואת מחירי ביטוח נסיעות לחו"ל</h1>
+
+        <form id="insurance-form" class="space-y-8">
+            <!-- כל קטעי הטופס כפי שהיו קיימים -->
+            <section>
+                 <h2 class="section-header">פרטי הנסיעה</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="start-date" class="form-label">תאריך יציאה</label>
+                        <input type="date" id="start-date" name="start-date" class="form-input w-full" required>
+                    </div>
+                    <div>
+                        <label for="end-date" class="form-label">תאריך חזרה</label>
+                        <input type="date" id="end-date" name="end-date" class="form-input w-full" required>
+                    </div>
+                    <div>
+                        <label for="destination" class="form-label">אזור יעד עיקרי</label>
+                        <select id="destination" name="destination" class="form-select w-full" required>
+                            <option value="" disabled selected>בחר אזור...</option>
+                            <option value="usa">ארה"ב</option>
+                            <option value="canada">קנדה</option>
+                            <option value="asia">אסיה</option>
+                            <option value="africa">אפריקה</option>
+                            <option value="central_south_america">מרכז ודרום אמריקה</option>
+                            <option value="australia_nz">אוסטרליה וניו זילנד</option>
+                            <option value="europe">אירופה</option>
+                            <option value="other">אחר</option>
+                        </select>
+                    </div>
+                 </div>
+             </section>
+
+             <section>
+                 <h2 class="section-header">פרטי הנוסעים</h2>
+                 <div class="mb-4">
+                     <label for="num-travelers" class="form-label">מספר נוסעים</label>
+                     <select id="num-travelers" name="num-travelers" class="form-select w-28" required>
+                         <option value="1" selected>1</option>
+                         <option value="2">2</option>
+                         <option value="3">3</option>
+                         <option value="4">4</option>
+                         <option value="5">5</option>
+                     </select>
+                 </div>
+                 <div id="travelers-details" class="space-y-4"></div>
+             </section>
+
+             <section>
+                <h2 class="section-header">בחירת כיסויים</h2>
+                <div class="space-y-3">
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="cover-medical" name="cover-medical" checked disabled>
+                        <label for="cover-medical" class="disabled-label">כיסוי רפואי והוצאות צד ג' (כיסוי חובה)</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="cover-cancellation" name="cover-cancellation">
+                        <label for="cover-cancellation">ביטול וקיצור נסיעה</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="cover-baggage" name="cover-baggage">
+                        <label for="cover-baggage">כבודה</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="cover-phone" name="cover-phone">
+                        <label for="cover-phone">טלפון נייד / סמארטפון</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="cover-laptop" name="cover-laptop">
+                        <label for="cover-laptop">מחשב נייד / טאבלט</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="cover-extreme-sports" name="cover-extreme-sports">
+                        <label for="cover-extreme-sports">ספורט אתגרי</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="cover-winter-sports" name="cover-winter-sports">
+                        <label for="cover-winter-sports">ספורט חורף</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="cover-pregnancy" name="cover-pregnancy">
+                        <label for="cover-pregnancy">הרחבת הריון (עד שבוע 32)</label>
+                    </div>
+                </div>
+             </section>
+        </form>
+
+        <div id="results-area" class="mt-12 hidden">
+            <h2 class="section-header text-center">השוואת מחירים</h2>
+            <div id="results-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            <p class="text-center text-sm text-gray-600 mt-8">
+                המחירים הינם להערכה בלבד ועשויים להשתנות בהתאם ליעד, משך הנסיעה המדויק, מצב רפואי קיים ושערי חליפין. יש ליצור קשר לאישור סופי.
+            </p>
+        </div>
+    </div>
+
+    <!-- קישור לוואטסאפ -->
+    <div class="whatsapp-link text-center mt-6">
+        <a href="https://wa.me/0502103596" target="_blank" class="flex items-center justify-center space-x-2">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo" class="h-6 w-6">
+            <span class="text-green-600 font-semibold">צור קשר בוואטסאפ</span>
+        </a>
+    </div>
+
+    <!-- Footer עם הלוגו שלך וההודעה -->
+    <footer class="text-center mt-6 pb-6">
+        <div class="flex items-center justify-center space-x-2">
+            <img src="לוגו בנצי פלג.jpg" alt="לוגו בנצי פלג" class="h-10">
+            <p class="text-sm text-gray-600">אתר זה מופעל על ידי סוכן ביטוח בנצי פלג</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- הגדרות כלליות ונתוני תמחור ---
+        // הנתונים וכל שאר קטעי ה-JS נשארו ללא שינוי כפי שהוגדרו במקור
+
+        const pricingData = {
+            'harel': {
+                name: 'הראל',
+                logo: 'הראל.jpg',
+                url: 'https://digital.harel-group.co.il/travel-policy?guid=bee1d408-c6a7-410e-b4ee-ac690224bdd3&an=053162',
+                basePricePerDay: [
+                    { ageMin: 0, ageMax: 60, price: 2.20 },
+                    { ageMin: 61, ageMax: 70, price: 3.30 },
+                    { ageMin: 71, ageMax: 80, price: 6.55 },
+                    { ageMin: 81, ageMax: 100, price: 11.60 }
+                ],
+                addons: {
+                    cancellation: {
+                        type: 'perDayAgeBased',
+                        prices: [
+                            { ageMin: 0, ageMax: 17, pricePerDay: 0.65 },
+                            { ageMin: 18, ageMax: 40, pricePerDay: 0.70 },
+                            { ageMin: 41, ageMax: 60, pricePerDay: 1.00 },
+                            { ageMin: 61, ageMax: 75, pricePerDay: 1.50 },
+                            { ageMin: 76, ageMax: 85, pricePerDay: 2.80 },
+                            { ageMin: 86, ageMax: 120, pricePerDay: 4.20 }
+                        ],
+                        maxTripCost: 21
+                    },
+                    baggage: { type: 'perDay', value: 0.39 },
+                    phone: { type: 'perDay', value: 1.60 },
+                    pregnancy: { type: 'perDay', value: 5.00, note: '$10.00 לארה"ב, עד גיל 42' },
+                    laptop: { type: 'perDay', value: 2.00 },
+                    extreme_sports: { type: 'perDay', value: 0.50 },
+                    winter_sports: { type: 'perDay', value: 9.00 }
+                },
+                notes: 'המחירים עבור נסיעה לארה"ב או מעל 14 יום עשויים להיות שונים.'
+            },
+            'migdal': {
+                name: 'מגדל',
+                logo: 'מגדל_חברה_לביטוח.svg.png',
+                url: 'https://travel.migdal.co.il/travel/index?id=1780',
+                basePricePerDay: [
+                    { ageMin: 0, ageMax: 17, price: 2.01 },
+                    { ageMin: 18, ageMax: 60, price: 2.20 },
+                    { ageMin: 61, ageMax: 70, price: 4.40 },
+                    { ageMin: 71, ageMax: 80, price: 8.70 },
+                    { ageMin: 81, ageMax: 100, price: 23.90 }
+                ],
+                addons: {
+                    cancellation: {
+                        type: 'perDayAgeBased',
+                        prices: [
+                            { ageMin: 0, ageMax: 75, pricePerDay: 1.50 },
+                            { ageMin: 76, ageMax: 120, pricePerDay: 2.50 }
+                        ],
+                        maxTripCost: 15
+                    },
+                    baggage: { type: 'perDay', value: 0.40 },
+                    phone: { type: 'perDay', value: 1.90 },
+                    pregnancy: { type: 'perDay', value: 4.00, note: 'עד $200,000 כיסוי, תקופה מרבית 60 ימים' },
+                    laptop: { type: 'perDay', value: 0.80 },
+                    extreme_sports: { type: 'perDay', value: 0.60 },
+                    winter_sports: { type: 'perDay', value: 6.75 }
+                },
+                notes: 'המחירים עבור נסיעה לארה"ב גבוהים יותר. המחירים כוללים כיסוי צד ג\' ואיתור/חילוץ.'
+            },
+            'passportcard': {
+                name: 'פספורטכארד',
+                logo: 'passportcard2.png',
+                url: 'https://app.passportcard.co.il/BrokerLandingPage/index/196',
+                basePricePerDay: [
+                    { ageMin: 0, ageMax: 60, price: 2.70 },
+                    { ageMin: 61, ageMax: 70, price: 4.10 },
+                    { ageMin: 71, ageMax: 80, price: 16.10 },
+                    { ageMin: 81, ageMax: 100, price: 25.30 }
+                ],
+                addons: {
+                    cancellation: {
+                        type: 'perDay',
+                        value: 0.80,
+                        maxTripCost: 16
+                    },
+                    baggage: { type: 'perDay', value: 0.50 },
+                    phone: { type: 'perDay', value: 1.60, note: 'קיימת אפשרות לכיסוי עד $1,600 בעלות $2.10 ליום' },
+                    pregnancy: { type: 'perDay', value: 5.00, note: 'עד שבוע 32, עד גיל 39' },
+                    laptop: { type: 'perDay', value: 0.50, note: 'קיימות אפשרויות כיסוי גבוהות יותר בעלות גבוהה יותר' },
+                    extreme_sports: { type: 'perDay', value: 0.50, note: '$1.00 מעל 30 יום' },
+                    winter_sports: { type: 'perDay', value: 8.00 }
+                },
+                notes: 'קיימת תוספת מחיר חובה בעת נסיעה לארצות הברית. המחירים מעל 30 יום עשויים להיות שונים. המחירים כוללים כיסוי צד ג\' ואיתור/חילוץ.'
+            },
+            'phoenix': {
+                name: 'הפניקס',
+                logo: 'הפניקס.png',
+                url: 'https://travel.agentsfnx.co.il/travel/landing.html?fnx_ANum=uPdhVjpTWF8%3d&referrer=www.b-pensia.com',
+                basePricePerDay: [
+                    { ageMin: 0, ageMax: 60, price: 2.10 },
+                    { ageMin: 61, ageMax: 70, price: 4.00 },
+                    { ageMin: 71, ageMax: 80, price: 9.80 },
+                    { ageMin: 81, ageMax: 100, price: 12.70 }
+                ],
+                addons: {
+                    cancellation: {
+                        type: 'perDayAgeBased',
+                        prices: [
+                            { ageMin: 0, ageMax: 60, pricePerDay: 0.70 },
+                            { ageMin: 61, ageMax: 120, pricePerDay: 0.80 }
+                        ],
+                        maxTripCostAgeBased: [
+                             { ageMin: 0, ageMax: 60, cap: 15 },
+                             { ageMin: 61, ageMax: 120, cap: 24 }
+                        ]
+                    },
+                    baggage: { type: 'perDay', value: 0.35 },
+                    phone: { type: 'perDay', value: 1.40 },
+                    pregnancy: { type: 'perDay', value: 4.50, note: '$9.00 לארה"ב/קנדה, עד גיל 42' },
+                    laptop: { type: 'perDay', value: 1.80 },
+                    extreme_sports: { type: 'perDay', value: 0.60 },
+                    winter_sports: { type: 'perDay', value: 7.50 }
+                },
+                notes: 'המחירים עבור נסיעה לארה"ב/קנדה או מעל 30 יום עשויים להיות שונים.'
+            }
+        };
+
+        // --- אלמנטים מה-DOM ---
+        const form = document.getElementById('insurance-form');
+        const numTravelersSelect = document.getElementById('num-travelers');
+        const travelersDetailsDiv = document.getElementById('travelers-details');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const destinationSelect = document.getElementById('destination');
+        const resultsArea = document.getElementById('results-area');
+        const resultsContainer = document.getElementById('results-container');
+
+        // --- פונקציות ---
+        function createTravelerInputs(index) {
+            const div = document.createElement('div');
+            div.classList.add('traveler-card', 'grid', 'grid-cols-1', 'md:grid-cols-12', 'gap-4', 'items-center');
+            div.innerHTML = `
+                <div class="md:col-span-2">
+                    <label class="form-label font-semibold text-gray-600">נוסע ${index + 1}</label>
+                </div>
+                <div class="md:col-span-5">
+                    <label for="traveler-age-${index}" class="form-label">גיל</label>
+                    <input type="number" id="traveler-age-${index}" name="traveler-age-${index}" min="0" max="120" placeholder="הזן גיל" class="form-input w-full traveler-age" required>
+                </div>
+                <div class="md:col-span-5">
+                    <label class="form-label">מין</label>
+                    <div class="flex space-x-4 space-x-reverse mt-1">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="traveler-gender-${index}" value="male" class="form-radio traveler-gender h-4 w-4" required>
+                            <span class="ml-2 text-gray-700">זכר</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="traveler-gender-${index}" value="female" class="form-radio traveler-gender h-4 w-4" required>
+                            <span class="ml-2 text-gray-700">נקבה</span>
+                        </label>
+                    </div>
+                </div>`;
+            return div;
+        }
+
+        function updateTravelerInputs() {
+            const numTravelers = parseInt(numTravelersSelect.value) || 0;
+            travelersDetailsDiv.querySelectorAll('.traveler-card').forEach(card => card.remove());
+            if (numTravelers > 0) {
+                for (let i = 0; i < numTravelers; i++)
+                    travelersDetailsDiv.appendChild(createTravelerInputs(i));
+            }
+            addInputListeners();
+        }
+
+        function calculateDuration() {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            if (isNaN(startDate) || isNaN(endDate) || endDate < startDate) return 0;
+            return Math.ceil(Math.abs(endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        function getBasePrice(companyKey, age) {
+            const companyData = pricingData[companyKey];
+            if (!companyData) return 0;
+            for (const bracket of companyData.basePricePerDay) {
+                if (age >= bracket.ageMin && age <= bracket.ageMax)
+                    return bracket.price;
+            }
+            console.warn(`לא נמצא מחיר בסיס לחברה ${companyKey}, גיל ${age}`);
+            return 0;
+        }
+
+        function calculatePrices() {
+            if (!form.checkValidity()) {
+                resultsArea.classList.add('hidden');
+                return;
+            }
+
+            const duration = calculateDuration();
+            if (duration <= 0) {
+                resultsArea.classList.add('hidden');
+                return;
+            }
+
+            const numTravelers = parseInt(numTravelersSelect.value);
+            const travelers = [];
+            let formIsValid = true;
+
+            for (let i = 0; i < numTravelers; i++) {
+                const ageInput = document.getElementById(`traveler-age-${i}`);
+                const genderInput = document.querySelector(`input[name="traveler-gender-${i}"]:checked`);
+                ageInput.classList.remove('border-red-500', 'focus:ring-red-500');
+
+                if (!ageInput || !genderInput || !ageInput.value || ageInput.value < 0 || ageInput.value > 120) {
+                    if (ageInput && (!ageInput.value || ageInput.value < 0 || ageInput.value > 120)) {
+                        ageInput.classList.add('border-red-500', 'focus:ring-red-500');
+                    }
+                    formIsValid = false;
+                } else {
+                    travelers.push({ age: parseInt(ageInput.value), gender: genderInput.value });
+                }
+            }
+
+            if (!formIsValid) {
+                resultsArea.classList.add('hidden');
+                return;
+            }
+
+            const selectedAddonsCheckboxes = {
+                cancellation: document.getElementById('cover-cancellation').checked,
+                baggage: document.getElementById('cover-baggage').checked,
+                phone: document.getElementById('cover-phone').checked,
+                laptop: document.getElementById('cover-laptop').checked,
+                extreme_sports: document.getElementById('cover-extreme-sports').checked,
+                winter_sports: document.getElementById('cover-winter-sports').checked,
+                pregnancy: document.getElementById('cover-pregnancy').checked
+            };
+
+            const companyResults = [];
+
+            for (const companyKey in pricingData) {
+                const company = pricingData[companyKey];
+                let totalCompanyPrice = 0;
+                let cancellationCostForCompany = 0;
+
+                travelers.forEach(traveler => {
+                    let travelerPrice = getBasePrice(companyKey, traveler.age) * duration;
+
+                    for (const addonKey in selectedAddonsCheckboxes) {
+                        if (selectedAddonsCheckboxes[addonKey] && company.addons[addonKey]?.type === 'perDay') {
+                            if (addonKey === 'pregnancy' && traveler.gender !== 'female') {
+                                return;
+                            }
+                            if (addonKey !== 'cancellation') {
+                                travelerPrice += (company.addons[addonKey].value * duration);
+                            }
+                        }
+                    }
+                    totalCompanyPrice += travelerPrice;
+                });
+
+                if (selectedAddonsCheckboxes.cancellation && company.addons.cancellation) {
+                    let totalCancellationCostBeforeCap = 0;
+                    travelers.forEach(traveler => {
+                        let dailyCancellationPrice = 0;
+                        const cancellationData = company.addons.cancellation;
+                        if (cancellationData.type === 'perDayAgeBased' && cancellationData.prices) {
+                            for (const bracket of cancellationData.prices) {
+                                if (traveler.age >= bracket.ageMin && traveler.age <= bracket.ageMax) {
+                                    dailyCancellationPrice = bracket.pricePerDay;
+                                    break;
+                                }
+                            }
+                        } else if (cancellationData.type === 'perDay' && cancellationData.value !== undefined) {
+                            dailyCancellationPrice = cancellationData.value;
+                        }
+                        totalCancellationCostBeforeCap += dailyCancellationPrice * duration;
+                    });
+                    cancellationCostForCompany = totalCancellationCostBeforeCap;
+                    if (company.addons.cancellation.maxTripCost !== undefined) {
+                        cancellationCostForCompany = Math.min(totalCancellationCostBeforeCap, company.addons.cancellation.maxTripCost);
+                    } else if (company.addons.cancellation.maxTripCostAgeBased) {
+                        let maxAge = Math.max(...travelers.map(t => t.age));
+                        let relevantCap = 0;
+                        for (const capBracket of company.addons.cancellation.maxTripCostAgeBased) {
+                            if (maxAge >= capBracket.ageMin && maxAge <= capBracket.ageMax) {
+                                relevantCap = capBracket.cap;
+                                break;
+                            }
+                        }
+                        cancellationCostForCompany = Math.min(totalCancellationCostBeforeCap, relevantCap);
+                    }
+                    totalCompanyPrice += cancellationCostForCompany;
+                }
+
+                companyResults.push({
+                    key: companyKey,
+                    name: company.name,
+                    logo: company.logo,
+                    url: company.url,
+                    price: totalCompanyPrice
+                });
+            }
+
+            const minPrice = companyResults.length > 0 ? Math.min(...companyResults.map(r => r.price)) : Infinity;
+            resultsContainer.innerHTML = '';
+            companyResults.forEach(result => {
+                const isCheapest = result.price === minPrice;
+                const buttonClass = isCheapest ? 'btn-cheapest' : 'btn-details';
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result-card');
+                if (isCheapest) {
+                    resultDiv.classList.add('border-green-500', 'border-2');
+                }
+                resultDiv.innerHTML = `
+                     ${result.logo ? `<img src="${result.logo}" alt="לוגו ${result.name}" class="mx-auto mb-3 h-12 object-contain" onerror="this.style.display='none'; this.parentElement.insertAdjacentHTML('afterbegin', '<h3 class=\'text-xl font-semibold text-gray-800 mb-3\'>${result.name}</h3>');">` : `<h3 class='text-xl font-semibold text-gray-800 mb-3'>${result.name}</h3>`}
+                    <div class="flex-grow">
+                        <p class="price">$${result.price.toFixed(2)}</p>
+                        <p class="price-label">מחיר סופי (משוער)</p>
+                    </div>
+                    <button class="btn ${buttonClass} text-sm w-full">לפרטים ורכישה</button>
+                `;
+                resultsContainer.appendChild(resultDiv);
+                const detailsButton = resultDiv.querySelector('.btn');
+                if (detailsButton && result.url) {
+                    detailsButton.addEventListener('click', () => {
+                        window.open(result.url, '_blank');
+                    });
+                }
+            });
+            resultsArea.classList.remove('hidden');
+        }
+
+        function addInputListeners() {
+             const inputsToWatch = [
+                 startDateInput, endDateInput, numTravelersSelect, destinationSelect,
+                 document.getElementById('cover-cancellation'), document.getElementById('cover-baggage'),
+                 document.getElementById('cover-phone'), document.getElementById('cover-laptop'),
+                 document.getElementById('cover-extreme-sports'), document.getElementById('cover-winter-sports'),
+                 document.getElementById('cover-pregnancy')
+             ];
+             inputsToWatch.forEach(input => {
+                 if(input) {
+                     input.removeEventListener('change', calculatePrices);
+                     input.addEventListener('change', calculatePrices);
+                 }
+             });
+             document.querySelectorAll('.traveler-age, .traveler-gender').forEach(input => {
+                 const eventType = input.type === 'number' ? 'input' : 'change';
+                 input.removeEventListener(eventType, calculatePrices);
+                 input.addEventListener(eventType, calculatePrices);
+             });
+         }
+
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        startDateInput.setAttribute('min', todayString);
+        endDateInput.setAttribute('min', todayString);
+
+        startDateInput.addEventListener('change', () => {
+            const startDateValue = startDateInput.value;
+            if (startDateValue) {
+                endDateInput.setAttribute('min', startDateValue);
+                if (endDateInput.value && endDateInput.value < startDateValue) {
+                    endDateInput.value = '';
+                }
+            } else {
+                endDateInput.setAttribute('min', todayString);
+            }
+            calculatePrices();
+        });
+
+        numTravelersSelect.addEventListener('change', updateTravelerInputs);
+        updateTravelerInputs();
+
+        destinationSelect.addEventListener('change', calculatePrices);
+        document.getElementById('cover-cancellation').addEventListener('change', calculatePrices);
+        document.getElementById('cover-baggage').addEventListener('change', calculatePrices);
+        document.getElementById('cover-phone').addEventListener('change', calculatePrices);
+        document.getElementById('cover-laptop').addEventListener('change', calculatePrices);
+        document.getElementById('cover-extreme-sports').addEventListener('change', calculatePrices);
+        document.getElementById('cover-winter-sports').addEventListener('change', calculatePrices);
+        document.getElementById('cover-pregnancy').addEventListener('change', calculatePrices);
+    </script>
+</body>
+</html>
