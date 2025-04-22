@@ -114,7 +114,21 @@
       @apply text-sm text-gray-600;
     }
   </style>
-</head>
+
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1410497183291017'); // Replace with your actual Pixel ID
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+         src="https://www.facebook.com/tr?id=1410497183291017&ev=PageView&noscript=1"/>
+  </noscript>
+  </head>
 <body class="p-4 md:p-6">
   <div class="main-container">
     <h1 class="text-3xl md:text-4xl font-bold text-center text-[var(--primary)] mb-10">השוואת מחירי ביטוח נסיעות לחו"ל</h1>
@@ -212,7 +226,6 @@
   </div>
 
   <div class="whatsapp-link text-center mt-6">
-    <!-- עדכון קישור וואטסאפ והוספת fallback לאייקון -->
     <a href="https://api.whatsapp.com/send?phone=972502103596" target="_blank" class="group inline-flex items-center justify-center space-x-2">
       <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo" class="h-6 w-6 transition-transform duration-200 group-hover:scale-110"
            onerror="this.outerHTML='<svg class=\'h-6 w-6 text-green-600\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'currentColor\'><path d=\'M20.52 3.48a10.6 10.6 0 00-7.51-3.12C7.94.36 0 3.7 0 11.03c0 2.1.56 4.11 1.63 5.9V24l4.08-1.36A10.78 10.78 0 0011.03 22c7.34 0 11.68-7.95 11.68-16.97 0-4.55-2.15-8.51-6.19-10.55z\'/></svg>';">
