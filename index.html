@@ -7,34 +7,54 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    /* שימוש בגופנים מודרניים */
+    /* שימוש בגופנים מודרניים וגודל פונט בסיסי */
     body {
       font-family: 'Roboto', sans-serif;
       background: linear-gradient(135deg, #e5f4ff, #ffffff);
       min-height: 100vh;
       background-attachment: fixed;
+      font-size: 1rem; /* גודל פונט בסיסי לכל הטקסט */
     }
     h1, h2, h3 {
       font-family: 'Montserrat', sans-serif;
     }
+    /* הסרת הגדרות ה-h1 הישנות שהוחלפו בתמונה */
+    /* h1 {
+        font-size: 5rem;
+        font-weight: 1000;
+    } */
+     h2 {
+        font-size: 1.5rem; /* גודל פונט לכותרות סקשנים */
+     }
+     h3 {
+        font-size: 1.25rem; /* גודל פונט לכותרות קטנות יותר */
+     }
+
     :root {
       --primary: #1e3a8a;
       --accent-green: #16a34a;
       --accent-red: #dc2626;
       --accent-orange: #f97316;
     }
-    /* שדות וקלטים */
+    /* שדות וקלטים - גודל פונט סטנדרטי */
     .form-input,
     .form-select {
-      @apply border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-[var(--accent-orange)] focus:border-[var(--accent-orange)] transition duration-200 ease-in-out shadow-sm focus:bg-orange-50;
+      /* חזרה לגודל פונט סטנדרטי, הסרת הדגשה */
+      font-size: 1rem; /* גודל פונט רגיל */
+      font-weight: normal; /* הסרת הדגשה */
+      padding: 0.625rem 0.75rem; /* ריפוד סטנדרטי (p-2.5 בטאלווינד) */
+      @apply border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--accent-orange)] focus:border-[var(--accent-orange)] transition duration-200 ease-in-out shadow-sm focus:bg-orange-50;
     }
+     /* הדגשת פונט בתוויות */
+    .form-label {
+      @apply block text-base font-bold text-gray-700 mb-1.5; /* גודל פונט בסיסי והדגשת התווית */
+    }
+
     .form-checkbox,
     .form-radio {
       @apply focus:ring-[var(--accent-orange)] text-blue-600;
     }
-    .form-label {
-      @apply block text-sm font-medium text-gray-700 mb-1.5;
-    }
+
     /* עיצוב כפתורים */
     .btn {
       @apply px-7 py-3 rounded-lg font-bold text-white transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:scale-105;
@@ -94,6 +114,8 @@
     }
     .checkbox-row label {
       @apply ml-3 text-gray-800 cursor-pointer;
+      font-size: 1rem; /* גודל פונט בסיסי לתוויות צ'קבוקס */
+      font-weight: normal; /* הסרת הדגשה אם הייתה */
     }
     .checkbox-row label.disabled-label {
       @apply cursor-default text-gray-600;
@@ -109,9 +131,18 @@
     .whatsapp-link a {
       @apply inline-flex items-center justify-center space-x-2 space-x-reverse;
     }
-    /* Footer */
+    /* Footer - גודל פונט קטן יותר */
     footer p {
-      @apply text-sm text-gray-600;
+      @apply text-xs text-gray-600; /* גודל פונט קטן יותר לגילוי נאות */
+    }
+     /* הדגשת הטקסט בתוך ה-whatsapp-link */
+    .whatsapp-link span {
+        font-weight: bold;
+    }
+
+    /* סגנון מיוחד לתמונת הכותרת */
+    .header-image {
+        @apply mx-auto mb-10 w-full max-w-xs h-auto; /* מרכוז, רוחב מקסימלי כשני שליש מהקודם (max-w-xs במקום max-w-md) והתאמת גובה */
     }
   </style>
 
@@ -131,8 +162,7 @@
   </head>
 <body class="p-4 md:p-6">
   <div class="main-container">
-    <h1 class="text-3xl md:text-4xl font-bold text-center text-[var(--primary)] mb-10">השוואת מחירי ביטוח נסיעות לחו"ל</h1>
-
+    <img src="3.png" alt="ביטוחו'ל - השוואת ביטוחי נסיעות" class="header-image">
     <form id="insurance-form" class="space-y-8">
       <section>
         <h2 class="section-header">פרטי הנסיעה</h2>
@@ -233,13 +263,23 @@
     </a>
   </div>
 
-  <footer class="text-center mt-6 pb-6">
-    <div class="flex items-center justify-center space-x-2 space-x-reverse">
-      <img src="לוגו בנצי פלג.jpg" alt="לוגו בנצי פלג" class="h-10" onerror="this.style.display='none';">
-      <p>אתר זה מופעל על ידי סוכן ביטוח בנצי פלג</p>
+  <footer class="text-center mt-8 pt-6 pb-6 border-t border-gray-200">
+    <div class="max-w-3xl mx-auto px-4 text-sm text-gray-600 space-y-3">
+      <div class="flex items-center justify-center space-x-2 space-x-reverse mb-3">
+        <img src="לוגו בנצי פלג.jpg" alt="לוגו בנצי פלג" class="h-10" onerror="this.style.display='none';">
+        <p class="font-semibold">אתר זה מופעל על ידי בנצי פלג, סוכן ביטוח מורשה</p>
+        </div>
+      <p>
+        אתר זה משמש להשוואת מחירים (הערכה בלבד) ורכישת פוליסות ביטוח נסיעות לחו"ל דרך קישורי סוכן. הרכישה מתבצעת בפועל באתרי חברות הביטוח הרלוונטיות באמצעות הקישורים המופיעים באתר זה.
+      </p>
+      <p>
+         בעבור רכישות המתבצעות דרך הקישורים באתר, סוכן הביטוח עשוי להיות זכאי לעמלה מחברות הביטוח. השימוש באתר מהווה הסכמה לכך.
+      </p>
+      <p>
+        <strong>הבהרה:</strong> המידע באתר זה הינו ראשוני ואינו מהווה תחליף לייעוץ אישי או לעיון בתנאי הפוליסה המלאים והמחייבים הנמצאים באתרי חברות הביטוח. הנתונים והמחירים עשויים להשתנות. ט.ל.ח.
+      </p>
     </div>
   </footer>
-
   <script>
     // Pricing data (נתוני תמחור כפי שהוגדרו במערכת)
     const pricingData = {
@@ -491,15 +531,18 @@
           for (const addonKey in selectedAddonsCheckboxes) {
             if (selectedAddonsCheckboxes[addonKey] && company.addons[addonKey]) {
               if (addonKey === 'pregnancy' && traveler.gender !== 'female') {
-                return;
-              }
-              if (company.addons[addonKey].type === 'perDay' && addonKey !== 'cancellation') {
-                travelerPrice += (company.addons[addonKey].value * duration);
+                // Skip pregnancy addon for males
+              } else {
+                if (company.addons[addonKey].type === 'perDay' && addonKey !== 'cancellation') {
+                  travelerPrice += (company.addons[addonKey].value * duration);
+                }
+                // Note: Cancellation is handled separately after the loop
               }
             }
           }
           totalCompanyPrice += travelerPrice;
         });
+
 
         if (selectedAddonsCheckboxes.cancellation && company.addons.cancellation) {
           let totalCancellationCostBeforeCap = 0;
@@ -621,12 +664,14 @@
         const group = document.getElementsByName(el.name);
         const anyChecked = Array.from(group).some(radio => radio.checked);
         group.forEach(radio => {
-          if (!anyChecked) {
-            radio.classList.add('border-invalid');
-          } else {
-            radio.classList.remove('border-invalid');
-            radio.classList.add('border-valid');
-          }
+            const label = radio.closest('label'); // Find the containing label
+            if (!anyChecked) {
+                if (label) label.classList.add('border-invalid'); // Add border to label for visibility
+                 // You might want visual feedback on the radio itself too, though it's tricky
+            } else {
+                if (label) label.classList.remove('border-invalid');
+                 // Remove visual feedback
+            }
         });
       } else if (el.type === 'checkbox' && el.required) {
         if (!el.checked) {
@@ -638,12 +683,15 @@
       }
     }
 
+
     // מוסיף מאזיני אירועים לוולידציה לכל השדות בטופס
     function addValidationListeners() {
       const allElements = document.querySelectorAll("#insurance-form input, #insurance-form select");
       allElements.forEach(el => {
         el.addEventListener('input', () => validateElement(el));
         el.addEventListener('change', () => validateElement(el));
+        // Trigger initial validation check for radio buttons groups if needed
+        // if (el.type === 'radio') validateElement(el);
       });
     }
 
@@ -663,11 +711,23 @@
       } else {
         endDateInput.setAttribute('min', todayString);
       }
+      validateElement(startDateInput); // Validate on change
+      if (endDateInput.value) validateElement(endDateInput); // Re-validate end date if start date changes
     });
+     endDateInput.addEventListener('change', () => {
+        validateElement(endDateInput); // Validate on change
+     });
+
     numTravelersSelect.addEventListener('change', updateTravelerInputs);
-    updateTravelerInputs();
-    addInputListeners();
-    addValidationListeners();
+    updateTravelerInputs(); // This now includes addInputListeners and addValidationListeners
+    // addInputListeners(); // Called inside updateTravelerInputs
+    // addValidationListeners(); // Called inside updateTravelerInputs
+
+    // Initial validation check for potentially pre-filled/default fields
+    validateElement(destinationSelect);
+    validateElement(numTravelersSelect);
+
+
   </script>
 </body>
 </html>
